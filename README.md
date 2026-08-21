@@ -19,7 +19,7 @@ bash <(curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xra
 **大陆服务器（GitHub 不可达时走镜像）：**
 
 ```bash
-bash <(curl -sSL https://ghproxy.net/https://raw.githubusercontent.com/<你的用户名>/<仓库名>/main/xray-proxy.sh)
+bash <(curl -sSL https://ghproxy.net/https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy.sh)
 ```
 
 要求：Ubuntu / Debian / CentOS，root 权限，服务器能访问 GitHub（或自动走镜像）。
