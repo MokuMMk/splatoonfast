@@ -14,13 +14,16 @@
 #     HTTP_PORT=20080     HTTP 代理端口
 #     SOCKS_PORT=20081    SOCKS5 代理端口
 #     PROXY_USER=switch   代理用户名
-#     PROXY_PASS=         代理密码: 交互安装会提示输入(留空自动生成强密码);
-#                         非交互安装(管道方式)必填, 不填将拒绝安装(安全性要求)
+#     PROXY_PASS=         代理密码: 默认在执行过程中通过交互终端输入(隐藏显示, 两次确认, 不能为空);
+#                         自动化场景可用环境变量指定
 #     REALITY_SNI=自动    伪装 SNI(默认从微软/苹果等候选自动挑选可用的)
 #     UUID=自动           VLESS 客户端 ID
 #     GH_MIRROR=          手动指定 GitHub 镜像前缀
 #
 #   示例: PROXY_USER=myuser PROXY_PASS=mypass XRAY_PORT=8443 bash <(curl -sSL ...)
+#
+#   Copyright (c) 2026 Moku Yui (https://github.com/MokuMMk)
+#   License: MIT License (见仓库 LICENSE 文件)
 # ============================================================================
 set -euo pipefail
 
@@ -52,7 +55,6 @@ command -v curl    >/dev/null 2>&1 || { err "缺少 curl，请先安装: apt ins
 command -v openssl >/dev/null 2>&1 || { err "缺少 openssl，请先安装"; exit 1; }
 
 json_escape(){ printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'; }
-rand_pass(){ head -c 18 /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 16; }
 
 install_pkg(){ # 静默安装系统包(失败不阻断)
   if command -v apt-get >/dev/null 2>&1; then
@@ -142,31 +144,30 @@ SERVICE
 install_xray
 
 # ---------------- 代理密码(安全性: 必须显式设置) ----------------
+# 默认在执行过程中通过交互终端(/dev/tty)输入, 兼容 bash <(curl -sSL ...) 与 curl ... | bash 两种安装方式;
+# 纯自动化环境(无终端)可用环境变量 PROXY_PASS 指定
 if [ -n "$PROXY_PASS" ]; then
-  ok "使用环境变量指定的代理密码"
-elif [ -t 0 ]; then
-  # 交互式终端: 提示输入, 两次确认, 留空则自动生成强密码
-  info "请输入代理密码(输入时不会显示, 留空则自动生成强密码):"
-  read -r -s PROXY_PASS
-  echo
-  if [ -n "$PROXY_PASS" ]; then
-    info "请再次输入确认:"
-    read -r -s PROXY_PASS_CONFIRM
-    echo
-    if [ "$PROXY_PASS" != "$PROXY_PASS_CONFIRM" ]; then
-      err "两次输入的密码不一致, 安装中止"
-      exit 1
-    fi
-    ok "密码已确认"
-  else
-    PROXY_PASS=$(rand_pass)
-    ok "已自动生成强密码"
+  ok "使用环境变量 PROXY_PASS 指定的代理密码"
+elif [ -r /dev/tty ] && [ -w /dev/tty ]; then
+  info "请输入代理密码(输入时不会显示):"
+  read -r -s PROXY_PASS < /dev/tty
+  echo > /dev/tty
+  if [ -z "$PROXY_PASS" ]; then
+    err "密码不能为空, 安装中止(安全性要求)"
+    exit 1
   fi
+  info "请再次输入确认:"
+  read -r -s PROXY_PASS_CONFIRM < /dev/tty
+  echo > /dev/tty
+  if [ "$PROXY_PASS" != "$PROXY_PASS_CONFIRM" ]; then
+    err "两次输入的密码不一致, 安装中止"
+    exit 1
+  fi
+  ok "密码已确认"
 else
-  # 非交互(管道)安装: 拒绝自动生成, 必须显式指定
-  err "出于安全性要求, 非交互安装必须显式指定代理密码:"
-  err "  PROXY_PASS=你的密码 bash <(curl -sSL <脚本地址>)"
-  err "或 PROXY_PASS=你的密码 bash $0"
+  err "无法打开交互终端(/dev/tty), 无法输入密码。请:"
+  err "  1) 在真实终端中运行: bash <(curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy.sh)"
+  err "  2) 或自动化场景设置环境变量: PROXY_PASS=你的密码 bash <(curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy.sh)"
   exit 1
 fi
 

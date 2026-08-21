@@ -39,23 +39,31 @@ bash <(curl -sSL https://ghproxy.net/https://raw.githubusercontent.com/<你的�
 
 ## 代理密码怎么设置（安全性要求）
 
-密码**不会**由脚本静默生成，必须显式设置，两种方式：
+密码**不会**由脚本静默生成，**默认在执行过程中通过交互终端输入**：
 
-**方式一：交互式安装（推荐，会提示你输入密码）**
+**方式一：交互式输入（默认，推荐）**
 
 ```bash
 bash <(curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy.sh)
+# 或
+curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy.sh | bash
 ```
 
-脚本会提示输入密码（输入时隐藏显示），并要求再次输入确认；**留空才会自动生成强密码**。
+脚本执行到密码步骤时，会通过交互终端（`/dev/tty`）提示你输入密码：
 
-**方式二：环境变量指定（适合管道式安装 / 脚本化）**
+- 输入时隐藏显示（不回显）
+- 需要输入两次确认
+- **密码不能为空**
+
+因为脚本直接从 `/dev/tty` 读取输入，**`bash <(curl ...)` 和 `curl ... | bash` 两种方式都能交互输入**。
+
+**方式二：环境变量指定（纯自动化场景）**
 
 ```bash
 PROXY_PASS=你的密码 bash <(curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy.sh)
 ```
 
-> ⚠️ 如果使用 `curl -sSL <地址> | bash` 这种管道方式且未设置 `PROXY_PASS`，脚本会**拒绝安装**并给出提示——这是有意为之，防止密码被隐式随机生成。
+> ⚠️ 若脚本无法打开交互终端（如 CI 等无终端环境）且未设置 `PROXY_PASS`，会**拒绝安装**并给出提示——这是有意为之，防止密码被隐式产生。
 
 **示例：**
 
@@ -109,3 +117,7 @@ HTTP 代理只转发 TCP 流量；纯 UDP/P2P 的对战数据（如 Splatoon 的
 - 路由：HTTP/SOCKS 代理入口直连出口（不受 geoip:cn 阻断规则影响）；VLESS 入口保留 bt/私有网段/国内 IP/广告域名阻断
 - 幂等：重复执行会备份旧配置（`config.json.bak.<时间戳>`）后覆盖
 - 自检：安装完成后自动经代理访问 Google 验证连通性
+
+## 许可证
+
+[MIT License](LICENSE) © 2026 Moku Yui
