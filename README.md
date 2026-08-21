@@ -51,7 +51,7 @@ curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy
 
 脚本执行到密码步骤时，会通过交互终端（`/dev/tty`）提示你输入密码：
 
-- 输入时隐藏显示（不回显）
+- 输入时直接显示（可见输入，方便确认没打错）
 - 需要输入两次确认
 - **密码不能为空**
 

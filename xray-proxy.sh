@@ -14,7 +14,7 @@
 #     HTTP_PORT=20080     HTTP 代理端口
 #     SOCKS_PORT=20081    SOCKS5 代理端口
 #     PROXY_USER=switch   代理用户名
-#     PROXY_PASS=         代理密码: 默认在执行过程中通过交互终端输入(隐藏显示, 两次确认, 不能为空);
+#     PROXY_PASS=         代理密码: 默认在执行过程中通过交互终端输入(输入可见, 两次确认, 不能为空);
 #                         自动化场景可用环境变量指定
 #     REALITY_SNI=自动    伪装 SNI(默认从微软/苹果等候选自动挑选可用的)
 #     UUID=自动           VLESS 客户端 ID
@@ -149,16 +149,14 @@ install_xray
 if [ -n "$PROXY_PASS" ]; then
   ok "使用环境变量 PROXY_PASS 指定的代理密码"
 elif [ -r /dev/tty ] && [ -w /dev/tty ]; then
-  info "请输入代理密码(输入时不会显示):"
-  read -r -s PROXY_PASS < /dev/tty
-  echo > /dev/tty
+  info "请输入代理密码(输入时可见):"
+  read -r PROXY_PASS < /dev/tty
   if [ -z "$PROXY_PASS" ]; then
     err "密码不能为空, 安装中止(安全性要求)"
     exit 1
   fi
   info "请再次输入确认:"
-  read -r -s PROXY_PASS_CONFIRM < /dev/tty
-  echo > /dev/tty
+  read -r PROXY_PASS_CONFIRM < /dev/tty
   if [ "$PROXY_PASS" != "$PROXY_PASS_CONFIRM" ]; then
     err "两次输入的密码不一致, 安装中止"
     exit 1
