@@ -13,7 +13,7 @@
 **海外服务器：**
 
 ```bash
-bash <(curl -sSL https://raw.githubusercontent.com/<你的用户名>/<仓库名>/main/xray-proxy.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy.sh)
 ```
 
 **大陆服务器（GitHub 不可达时走镜像）：**
@@ -44,7 +44,7 @@ bash <(curl -sSL https://ghproxy.net/https://raw.githubusercontent.com/<你的�
 **方式一：交互式安装（推荐，会提示你输入密码）**
 
 ```bash
-bash <(curl -sSL <脚本地址>)
+bash <(curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy.sh)
 ```
 
 脚本会提示输入密码（输入时隐藏显示），并要求再次输入确认；**留空才会自动生成强密码**。
@@ -52,7 +52,7 @@ bash <(curl -sSL <脚本地址>)
 **方式二：环境变量指定（适合管道式安装 / 脚本化）**
 
 ```bash
-PROXY_PASS=你的密码 bash <(curl -sSL <脚本地址>)
+PROXY_PASS=你的密码 bash <(curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy.sh)
 ```
 
 > ⚠️ 如果使用 `curl -sSL <地址> | bash` 这种管道方式且未设置 `PROXY_PASS`，脚本会**拒绝安装**并给出提示——这是有意为之，防止密码被隐式随机生成。
@@ -60,7 +60,7 @@ PROXY_PASS=你的密码 bash <(curl -sSL <脚本地址>)
 **示例：**
 
 ```bash
-PROXY_USER=myuser PROXY_PASS=mypass XRAY_PORT=8443 bash <(curl -sSL <脚本地址>)
+PROXY_USER=myuser PROXY_PASS=mypass XRAY_PORT=8443 bash <(curl -sSL https://raw.githubusercontent.com/MokuMMk/splatoonfast/main/xray-proxy.sh)
 ```
 
 ## 安装后你会得到
